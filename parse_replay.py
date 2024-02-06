@@ -23,9 +23,11 @@ def parse_replay(folder):
     for pid in set([p["player_id"] for p in players]):
         vehicles = []
         for v in list(set([p["vehicle"] for p in players if p["player_id"] == pid])):
-            vehicles.append(
+            for w in list(set([p["weapon_preset"] for p in players if p["player_id"] == pid and p["vehicle"] == v])):
+                vehicles.append(
                 {
                     "vehicle": v,
+                    "weapon_preset": w if len(w) > 0 else "default",
                     "num_appearances": len([p for p in players if p["player_id"] == pid and p["vehicle"] == v])
                 }
             )
@@ -144,10 +146,16 @@ def _parse_replay_file(path):
             # only if the vehicle name is at least 2 letters, it is actually not garbage
             if len(vehicle) > 2 and vehicle not in ignored_vehicles:
 
-                # player id can be founx at the position m.start() - 4
+                # player id can be found at the position m.start() - 4
                 player_id = replay[m.start() - 4]
 
-                players.append({"player_id" : player_id, "vehicle" : vehicle})
+
+                vehicle_name_len = len(vehicle)
+
+                # weapon preset can be found at m.start + length of vehicle name string
+                weapon_preset = _get_text(replay[m.start() + vehicle_name_len + 5:m.start() + vehicle_name_max_len + 30])
+
+                players.append({"player_id" : player_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset})
         except:
             pass
     
@@ -167,7 +175,7 @@ def main():
     data = parse_replay(folder)
 
     print()
-    print(json.dumps(data, indent=4))
+    print(json.dumps(data, indent=2, separators=(',',':')))
 
 if __name__ == "__main__":
     main()
