@@ -24,12 +24,14 @@ def parse_replay(folder):
         vehicles = []
         for v in list(set([p["vehicle"] for p in players if p["player_id"] == pid])):
             for w in list(set([p["weapon_preset"] for p in players if p["player_id"] == pid and p["vehicle"] == v])):
-                vehicles.append(
-                {
-                    "vehicle": v,
-                    "weapon_preset": w if len(w) > 0 else "default",
-                    "num_appearances": len([p for p in players if p["player_id"] == pid and p["vehicle"] == v])
-                }
+                for s in list(set([p["skin"] for p in players if p["player_id"] == pid and p["vehicle"] == v])):
+                    vehicles.append(
+                    {
+                        "vehicle": v,
+                        "weapon_preset": w if len(w) > 0 else "default",
+                        "skin" : s if len(s) > 0 else "default",
+                        "num_appearances": len([p for p in players if p["player_id"] == pid and p["vehicle"] == v])
+                    }
             )
         players2.append({
             "player_id" : pid,
@@ -149,13 +151,15 @@ def _parse_replay_file(path):
                 # player id can be found at the position m.start() - 4
                 player_id = replay[m.start() - 4]
 
-
                 vehicle_name_len = len(vehicle)
 
-                # weapon preset can be found at m.start + length of vehicle name string
-                weapon_preset = _get_text(replay[m.start() + vehicle_name_len + 5:m.start() + vehicle_name_max_len + 30])
+                weapon_preset = _get_text(replay[m.start() + vehicle_name_len + 5:m.start() + vehicle_name_max_len + 255])
 
-                players.append({"player_id" : player_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset})
+                weapon_preset_len = len(weapon_preset)
+
+                skin = _get_text(replay[m.start() + vehicle_name_len + weapon_preset_len + 6:m.start() + vehicle_name_max_len + 255])
+
+                players.append({"player_id" : player_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset, "skin" : skin})
         except:
             pass
     
