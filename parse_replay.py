@@ -140,10 +140,10 @@ def _parse_replay_file(path):
     # find all magics in the replay file
     for m in magic.finditer(replay):
 
-        vehicle_name_max_len = 30
+        name_max_len = 255
 
         try:
-            vehicle = _get_text(replay[m.start() + 4:m.start() + vehicle_name_max_len + 30])
+            vehicle = _get_text(replay[m.start() + 4:m.start() + name_max_len])
         
             # only if the vehicle name is at least 2 letters, it is actually not garbage
             if len(vehicle) > 2 and vehicle not in ignored_vehicles:
@@ -153,11 +153,11 @@ def _parse_replay_file(path):
 
                 vehicle_name_len = len(vehicle)
 
-                weapon_preset = _get_text(replay[m.start() + vehicle_name_len + 5:m.start() + vehicle_name_max_len + 255])
+                weapon_preset = _get_text(replay[m.start() + vehicle_name_len + 5:m.start() + name_max_len])
 
                 weapon_preset_len = len(weapon_preset)
 
-                skin = _get_text(replay[m.start() + vehicle_name_len + weapon_preset_len + 6:m.start() + vehicle_name_max_len + 255])
+                skin = _get_text(replay[m.start() + vehicle_name_len + weapon_preset_len + 6:m.start() + name_max_len])
 
                 players.append({"player_id" : player_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset, "skin" : skin})
         except:
