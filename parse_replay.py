@@ -12,36 +12,36 @@ def parse_replay(folder):
 
     replay_files = _get_files(folder)
 
-    players = []
+    units = []
     for file in replay_files:
         print(f"parsing {file}")
-        players += _parse_replay_file(file)
+        units += _parse_replay_file(file)
     
-    # join the playerids
-    players2 = []
+    # join the unit ids
+    units2 = []
 
-    for pid in set([p["player_id"] for p in players]):
+    for uid in set([u["unit_id"] for u in units]):
         vehicles = []
-        for v in list(set([p["vehicle"] for p in players if p["player_id"] == pid])):
-            for w in list(set([p["weapon_preset"] for p in players if p["player_id"] == pid and p["vehicle"] == v])):
-                for s in list(set([p["skin"] for p in players if p["player_id"] == pid and p["vehicle"] == v])):
+        for v in list(set([u["vehicle"] for u in units if u["unit_id"] == uid])):
+            for w in list(set([u["weapon_preset"] for u in units if u["unit_id"] == uid and u["vehicle"] == v])):
+                for s in list(set([u["skin"] for u in units if u["unit_id"] == uid and u["vehicle"] == v])):
                     vehicles.append(
                     {
                         "vehicle": v,
                         "weapon_preset": w if len(w) > 0 else "default",
-                        "skin" : s if len(s) > 0 else "default",
-                        "num_appearances": len([p for p in players if p["player_id"] == pid and p["vehicle"] == v])
+                        "skin" : s if len(s) > 8 else "default",
+                        "num_appearances": len([u for u in units if u["unit_id"] == uid and u["vehicle"] == v])
                     }
             )
-        players2.append({
-            "player_id" : pid,
+        units2.append({
+            "unit_id" : uid,
             "vehicles": vehicles,
-            "num_appearances": len([p for p in players if p["player_id"] == pid])
+            "num_appearances": len([p for p in units if p["unit_id"] == uid])
         })
 
     data = _get_metadata(folder)
-    data['num_players'] = len(players2)
-    data['players'] = players2
+    data['num_players'] = len(units2)
+    data['units'] = units2
 
     return data
 
@@ -135,11 +135,12 @@ def _parse_replay_file(path):
     with open(path, 'rb') as f:
         replay = f.read()
         
-    players = []
+    units = []
 
     # find all magics in the replay file
     for m in magic.finditer(replay):
-
+        
+        # the byte before a name string determines its length so 255 is the max length 
         name_max_len = 255
 
         try:
@@ -149,7 +150,7 @@ def _parse_replay_file(path):
             if len(vehicle) > 2 and vehicle not in ignored_vehicles:
 
                 # player id can be found at the position m.start() - 4
-                player_id = replay[m.start() - 4]
+                unit_id = replay[m.start() - 4]
 
                 vehicle_name_len = len(vehicle)
 
@@ -157,13 +158,16 @@ def _parse_replay_file(path):
 
                 weapon_preset_len = len(weapon_preset)
 
+                # sometimes there will be a single extra printable char at the end of this string
+                # i just manually remove it from the resulting file because my brain is small
+                # example: "defaultI" (the I shouldn't be there)
                 skin = _get_text(replay[m.start() + vehicle_name_len + weapon_preset_len + 6:m.start() + name_max_len])
 
-                players.append({"player_id" : player_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset, "skin" : skin})
+                units.append({"unit_id" : unit_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset, "skin" : skin})
         except:
             pass
     
-    return players
+    return units
 
 
 def main():
@@ -178,8 +182,13 @@ def main():
 
     data = parse_replay(folder)
 
+    file_path = os.getcwd()
+    with open(f'{file_path}/units.json', 'x') as ostream:
+        json.dump(data, ostream, indent=2, separators=(',',':'))
+
+
     print()
-    print(json.dumps(data, indent=2, separators=(',',':')))
+    print(json.dumps(data, indent=2, separators=('',':')))
 
 if __name__ == "__main__":
     main()
