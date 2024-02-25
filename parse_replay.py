@@ -165,8 +165,7 @@ def _parse_replay_file(path):
 
                 units.append({"unit_id" : unit_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset, "skin" : skin})
         except:
-            print(skin_len)
-            raise
+            pass
     
     return units
 
