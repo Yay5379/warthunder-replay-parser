@@ -28,8 +28,8 @@ def parse_replay(folder):
                     vehicles.append(
                     {
                         "vehicle": v,
-                        "weapon_preset": w if len(w) > 0 else "default",
-                        "skin" : s if len(s) > 8 else "default",
+                        "weapon_preset": w,
+                        "skin" : s,
                         "num_appearances": len([u for u in units if u["unit_id"] == uid and u["vehicle"] == v])
                     }
             )
@@ -152,20 +152,21 @@ def _parse_replay_file(path):
                 # player id can be found at the position m.start() - 4
                 unit_id = replay[m.start() - 4]
 
-                vehicle_name_len = len(vehicle)
+                weapon_preset_len = replay[m.start() + len(vehicle) + 4]
 
-                weapon_preset = _get_text(replay[m.start() + vehicle_name_len + 5:m.start() + name_max_len])
+                weapon_preset = _get_text(replay[m.start() + len(vehicle) + 5:m.start() + name_max_len]) if weapon_preset_len > 0 else "default"
 
-                weapon_preset_len = len(weapon_preset)
+                skin_len = replay[m.start() + len(vehicle) + len(weapon_preset) + 5]
 
-                # sometimes there will be a single extra printable char at the end of this string
-                # i just manually remove it from the resulting file because my brain is small
-                # example: "defaultI" (the I shouldn't be there)
-                skin = _get_text(replay[m.start() + vehicle_name_len + weapon_preset_len + 6:m.start() + name_max_len])
+                skin = _get_text(replay[m.start() + len(vehicle) + len(weapon_preset) + 6:m.start() + name_max_len]) if skin_len > 0 else "default"
+
+                if len(skin) != skin_len and skin is not "default":
+                    skin = skin.rstrip(skin[-1])
 
                 units.append({"unit_id" : unit_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset, "skin" : skin})
         except:
-            pass
+            print(skin_len)
+            raise
     
     return units
 
@@ -182,13 +183,13 @@ def main():
 
     data = parse_replay(folder)
 
+    folder_name = "test"
     file_path = os.getcwd()
-    with open(f'{file_path}/units.json', 'x') as ostream:
+    with open(f'{file_path}/{folder_name}.json', 'x') as ostream:
         json.dump(data, ostream, indent=2, separators=(',',':'))
 
-
     print()
-    print(json.dumps(data, indent=2, separators=('',':')))
+    print(json.dumps(data, indent=2, separators=(',',':')))
 
 if __name__ == "__main__":
     main()
