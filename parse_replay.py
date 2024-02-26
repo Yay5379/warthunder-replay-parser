@@ -160,7 +160,7 @@ def _parse_replay_file(path):
 
                 skin = _get_text(replay[m.start() + len(vehicle) + len(weapon_preset) + 6:m.start() + name_max_len]) if skin_len > 0 else "default"
 
-                if len(skin) != skin_len and skin is not "default":
+                if len(skin) != skin_len and skin != "default":
                     skin = skin.rstrip(skin[-1])
 
                 units.append({"unit_id" : unit_id, "vehicle" : vehicle, "weapon_preset" : weapon_preset, "skin" : skin})
