@@ -182,7 +182,7 @@ def main():
 
     data = parse_replay(folder)
 
-    folder_name = "test"
+    folder_name = os.path.basename(folder)
     file_path = os.getcwd()
     with open(f'{file_path}/{folder_name}.json', 'x') as ostream:
         json.dump(data, ostream, indent=2, separators=(',',':'))
