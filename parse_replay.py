@@ -184,8 +184,15 @@ def main():
 
     folder_name = os.path.basename(folder)
     file_path = os.getcwd()
-    with open(f'{file_path}/{folder_name}.json', 'x') as ostream:
-        json.dump(data, ostream, indent=2, separators=(',',':'))
+    i = 2
+    if os.path.exists(f'{file_path}/{folder_name}.json'):
+        while os.path.exists(f'{file_path}/{folder_name}({i}).json'):
+            i += 1
+            with open(f'{file_path}/{folder_name}({i}).json', 'x') as ostream:
+                json.dump(data, ostream, indent=2, separators=(',',':'))
+    else:
+        with open(f'{file_path}/{folder_name}.json', 'x') as ostream:
+            json.dump(data, ostream, indent=2, separators=(',',':'))
 
     print()
     print(json.dumps(data, indent=2, separators=(',',':')))
