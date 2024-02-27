@@ -60,7 +60,7 @@ def _parse_datablocks(path):
 
                 if datablock_magic == 1:
                     print(f"parsing {vehicle}")
-                    # idk how to make this read the actual datablock size but is still works
+                    # idk how to make this read the actual datablock size but it still works
                     datablock = BytesIO(replay[m.end() + vehicle_len + weapon_preset_len + skin_len + 5:m.end() + 8192])
                     with datablock as istream:
                         try:
