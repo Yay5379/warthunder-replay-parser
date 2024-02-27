@@ -68,9 +68,9 @@ def _parse_datablocks(path):
                             with create_text(vehicle) as ostream:
                                 serialize_text(root, ostream)
                         except:
-                            raise
+                            pass
         except:
-            raise
+            pass
 
 def main():
     file = os.path.abspath(sys.argv[1])
