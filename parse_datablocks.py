@@ -16,7 +16,8 @@ def create_text(name) -> t.TextIO:
     else:
         return open(f'{file_path}/{name}.blk', 'x')
 
-def serialize_text(root, ostream):
+def serialize_text(root, ostream, data):
+    print(data, file=ostream)
     txt.serialize(root, ostream, dialect=txt.StrictDialect)
 
 def _get_text(bstring, letters=None):
@@ -49,24 +50,42 @@ def _parse_datablocks(path):
             vehicle = _get_text(replay[m.end() + 1:m.end() + 255])
 
             if len(vehicle) > 2 and vehicle not in ignored_vehicles:
+
+                unit_id = replay[m.start() - 4]
                 
                 vehicle_len = replay[m.end()]
 
                 weapon_preset_len = replay[m.end() + vehicle_len + 1]
 
+                weapon_preset = _get_text(replay[m.end() + len(vehicle) + 2:m.end() + 255]) if weapon_preset_len > 0 else "default"
+
                 skin_len = replay[m.end() + vehicle_len + weapon_preset_len + 2]
+
+                skin = _get_text(replay[m.end() + len(vehicle) + len(weapon_preset) + 3:m.end() + 255]) if skin_len > 0 else "default"
 
                 datablock_magic = replay[m.end() + vehicle_len + weapon_preset_len + skin_len + 5]
 
+                if len(skin) != skin_len and skin != "default":
+                    skin = skin.rstrip(skin[-1])
+
                 if datablock_magic == 1:
                     print(f"parsing {vehicle}")
+                        
+                    unit_data=(
+                        f'unit_id:i={unit_id}\n'
+                        f'vehicle:t="{vehicle}"\n'
+                        f'weapon_preset:t="{weapon_preset}"\n'
+                        f'skin:t="{skin}"'
+                        )
+
                     # idk how to make this read the actual datablock size but it still works
                     datablock = BytesIO(replay[m.end() + vehicle_len + weapon_preset_len + skin_len + 5:m.end() + 8192])
+
                     with datablock as istream:
                         try:
                             root = bin.compose_fat(istream)
                             with create_text(vehicle) as ostream:
-                                serialize_text(root, ostream)
+                                serialize_text(root, ostream, unit_data)
                         except:
                             pass
         except:
