@@ -8,15 +8,17 @@ from io import BytesIO
 
 def create_text(name, uid) -> t.TextIO:
     file_path = os.getcwd()
-    if uid is None:
-        if os.path.exists(f'{file_path}/{name}.blk'):
-            return open(f'{file_path}/{name}.blk', 'a')
-        else:
-            return open(f'{file_path}/{name}.blk', 'x')
-    elif os.path.exists(f'{file_path}/{name}({uid}).blk'):
+    if os.path.exists(f'{file_path}/{name}({uid}).blk'):
         pass
     else:
         return open(f'{file_path}/{name}({uid}).blk', 'x')
+
+def create_text_log(name, pid):
+    file_path = os.getcwd()
+    if os.path.exists(f'{file_path}/{name}({pid}).blk'):
+        return open(f'{file_path}/{name}({pid}).blk', 'a')
+    else:
+        return open(f'{file_path}/{name}({pid}).blk', 'x')
 
 def serialize_text(root, ostream, data):
     if root is None:
@@ -119,20 +121,16 @@ def parse_streaks(path):
         try:
             streak_id = replay[m.end()]
 
-            streak_bg_id = replay[m.end() + 2]
-
-            streak_icon_id = replay[m.end() + 3]
+            player_id = replay[m.end() + 3]
 
             streak_name = _get_text(replay[m.end() + 8:m.end() + 255])
 
             streak_data=(
                 f'streak:t="{streak_name}"\n'
                 f'streak_id:i={streak_id}\n'
-                f'background_id:i={streak_bg_id}\n'
-                f'icon_id:i={streak_icon_id}\n'
             )
 
-            with create_text('streak_data', None) as ostream:
+            with create_text_log('streak_data', player_id) as ostream:
                 serialize_text(None, ostream, streak_data)
         except:
             pass
