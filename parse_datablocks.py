@@ -6,19 +6,12 @@ import blk.text as txt
 import typing as t
 from io import BytesIO
 
-def create_text(name, uid) -> t.TextIO:
+def create_text(name:str, uid:int) -> t.TextIO:
     file_path = os.getcwd()
     if os.path.exists(f'{file_path}/{name}({uid}).blk'):
-        pass
+        return open(f'{file_path}/{name}({uid}).blk', 'a')
     else:
         return open(f'{file_path}/{name}({uid}).blk', 'x')
-
-def create_text_log(name, pid):
-    file_path = os.getcwd()
-    if os.path.exists(f'{file_path}/{name}({pid}).blk'):
-        return open(f'{file_path}/{name}({pid}).blk', 'a')
-    else:
-        return open(f'{file_path}/{name}({pid}).blk', 'x')
 
 def serialize_text(root, ostream, data):
     if root is None:
@@ -130,7 +123,7 @@ def parse_streaks(path):
                 f'streak_id:i={streak_id}\n'
             )
 
-            with create_text_log('streak_data', player_id) as ostream:
+            with create_text('streak_data', player_id) as ostream:
                 serialize_text(None, ostream, streak_data)
         except:
             pass
