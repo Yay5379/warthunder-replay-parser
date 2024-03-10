@@ -5,6 +5,7 @@ import blk.binary as bin
 import blk.text as txt
 import typing as t
 from io import BytesIO
+from blk.types import Section
 
 def create_text(name:str, uid:int) -> t.TextIO:
     file_path = os.getcwd()
@@ -13,7 +14,7 @@ def create_text(name:str, uid:int) -> t.TextIO:
     else:
         return open(f'{file_path}/{name}({uid}).blk', 'x')
 
-def serialize_text(root, ostream, data):
+def serialize_text(root:Section, ostream:t.TextIO, data:str):
     if root is None:
         print(data, file=ostream)
     else:
@@ -36,7 +37,7 @@ def _get_text(bstring, letters=None):
 
     return text
 
-def parse_datablocks(path):
+def parse_datablocks(path:str):
 
     magic = re.compile(b'\x01\x20\x01')
 
@@ -103,7 +104,7 @@ def parse_datablocks(path):
         except:
             pass
 
-def parse_streaks(path):
+def parse_streaks(path:str):
 
     magic = re.compile(b'\x02\x58\x78\xf0')
 
