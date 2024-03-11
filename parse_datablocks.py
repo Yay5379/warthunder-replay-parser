@@ -12,14 +12,14 @@ def create_text(name:str, id:int) -> t.TextIO:
     if os.path.exists(f'{file_path}/{name}({id}).blk'):
         pass
     else:
-        return open(f'{file_path}/{name}({uid}).blk', 'x')
+        return open(f'{file_path}/{name}({id}).blk', 'x')
 
 def create_log(name:str, id:int) -> t.TextIO:
     file_path = os.getcwd()
-    if os.path.exists(f'{file_path}/{name}({id}).txt')
+    if os.path.exists(f'{file_path}/{name}({id}).txt'):
         return open(f'{file_path}/{name}({id}).txt', 'a')
     else:
-    return open(f'{file_path}/{name}({id}).txt', 'a')
+        return open(f'{file_path}/{name}({id}).txt', 'a')
 
 def serialize_text(root:Section, ostream:t.TextIO, data:str):
     if root is None:
