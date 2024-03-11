@@ -7,12 +7,19 @@ import typing as t
 from io import BytesIO
 from blk.types import Section
 
-def create_text(name:str, uid:int) -> t.TextIO:
+def create_text(name:str, id:int) -> t.TextIO:
     file_path = os.getcwd()
-    if os.path.exists(f'{file_path}/{name}({uid}).blk'):
-        return open(f'{file_path}/{name}({uid}).blk', 'a')
+    if os.path.exists(f'{file_path}/{name}({id}).blk'):
+        pass
     else:
         return open(f'{file_path}/{name}({uid}).blk', 'x')
+
+def create_log(name:str, id:int) -> t.TextIO:
+    file_path = os.getcwd()
+    if os.path.exists(f'{file_path}/{name}({id}).txt')
+        return open(f'{file_path}/{name}({id}).txt', 'a')
+    else:
+    return open(f'{file_path}/{name}({id}).txt', 'a')
 
 def serialize_text(root:Section, ostream:t.TextIO, data:str):
     if root is None:
@@ -120,11 +127,11 @@ def parse_streaks(path:str):
             streak_name = _get_text(replay[m.end() + 8:m.end() + 255])
 
             streak_data=(
-                f'streak:t="{streak_name}"\n'
+                f'{player_id} has achived {streak_name}\n'
                 f'streak_id:i={streak_id}\n'
             )
 
-            with create_text('streak_data', player_id) as ostream:
+            with create_log('streak_data', player_id) as ostream:
                 serialize_text(None, ostream, streak_data)
         except:
             pass
