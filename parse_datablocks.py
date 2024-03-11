@@ -127,7 +127,7 @@ def parse_streaks(path:str):
             streak_name = _get_text(replay[m.end() + 8:m.end() + 255])
 
             streak_data=(
-                f'{player_id} has achived {streak_name}\n'
+                f'player({player_id}) has achived {streak_name}\n'
                 f'streak_id:i={streak_id}\n'
             )
 
