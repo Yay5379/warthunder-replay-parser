@@ -7,23 +7,28 @@ import typing as t
 from io import BytesIO
 from blk.types import Section
 
+# creats a datablock (.blk) file
 def create_text(name:str, id:int) -> t.TextIO:
     file_path = os.getcwd()
     if os.path.exists(f'{file_path}/{name}({id}).blk'):
         pass
     else:
         return open(f'{file_path}/{name}({id}).blk', 'x')
-
+    
+# creates a log file of events that happened in a replay
 def create_log(name:str, id:int) -> t.TextIO:
     file_path = os.getcwd()
     if os.path.exists(f'{file_path}/{name}({id}).txt'):
         return open(f'{file_path}/{name}({id}).txt', 'a')
     else:
-        return open(f'{file_path}/{name}({id}).txt', 'a')
-
+        return open(f'{file_path}/{name}({id}).txt', 'x')
+    
+# writes or appends data to newly created file
 def serialize_text(root:Section, ostream:t.TextIO, data:str):
     if root is None:
         print(data, file=ostream)
+    elif data is None:
+        txt.serialize(root, ostream, dialect=txt.StrictDialect)
     else:
         print(data, file=ostream)
         txt.serialize(root, ostream, dialect=txt.StrictDialect)
@@ -44,6 +49,7 @@ def _get_text(bstring, letters=None):
 
     return text
 
+# parses unit blk data
 def parse_datablocks(path:str):
 
     magic = re.compile(b'\x01\x20\x01')
@@ -111,6 +117,44 @@ def parse_datablocks(path:str):
         except:
             pass
 
+# I still need to find a way to join this data with the corresponding vehicle data
+def parse_other_datablocks(path):
+
+    magic = re.compile(b'\x61\x74\x74\x61\x63\x68\x61\x62\x6c\x65') #'attachable'
+
+    with open(path, 'rb') as f:
+        replay = f.read()
+
+    for m in magic.finditer(replay):
+
+        has_preset = replay[m.start() - 13]
+
+        i = 1
+
+        if has_preset == 7:
+            datablock = BytesIO(replay[m.start() - 14:m.start() + 2048])
+
+            with datablock as istream:
+                try:
+                    root = bin.compose_fat(istream)
+                    with create_text('test_block', i) as ostream:
+                        serialize_text(root, ostream, None)
+                except:
+                    pass
+            i += 1
+        
+        else:
+            datablock = BytesIO(replay[m.start() - 3:m.start() + 2048])
+
+            with datablock as istream:
+                try:
+                    root = bin.compose_fat(istream)
+                    with create_text('test_block', i) as ostream:
+                        serialize_text(root, ostream, None)
+                except:
+                    pass
+            i += 1
+
 def parse_streaks(path:str):
 
     magic = re.compile(b'\x02\x58\x78\xf0')
@@ -142,6 +186,7 @@ def main():
     print(f"parsing replay in {file}")
 
     parse_datablocks(file)
+    parse_other_datablocks(file)
     parse_streaks(file)
 
 if __name__ == "__main__":
