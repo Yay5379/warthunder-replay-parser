@@ -102,6 +102,7 @@ def parse_datablocks(path:str):
                                 serialize_text(root, ostream, unit_data)
                         except:
                             pass
+
                 else:
                     print(f"parsing {vehicle}({unit_id})")
 
@@ -125,11 +126,11 @@ def parse_other_datablocks(path):
     with open(path, 'rb') as f:
         replay = f.read()
 
+    i = 1
+
     for m in magic.finditer(replay):
 
         has_preset = replay[m.start() - 13]
-
-        i = 1
 
         if has_preset == 7:
             datablock = BytesIO(replay[m.start() - 14:m.start() + 2048])
@@ -139,9 +140,9 @@ def parse_other_datablocks(path):
                     root = bin.compose_fat(istream)
                     with create_text('test_block', i) as ostream:
                         serialize_text(root, ostream, None)
+                        i += 1
                 except:
                     pass
-            i += 1
         
         else:
             datablock = BytesIO(replay[m.start() - 3:m.start() + 2048])
@@ -151,9 +152,9 @@ def parse_other_datablocks(path):
                     root = bin.compose_fat(istream)
                     with create_text('test_block', i) as ostream:
                         serialize_text(root, ostream, None)
+                        i += 1
                 except:
                     pass
-            i += 1
 
 def parse_streaks(path:str):
 
