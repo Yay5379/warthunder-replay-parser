@@ -2,7 +2,7 @@ import os.path
 import sys
 from cx_Freeze import setup, Executable
 
-src_path = "src/warthunder-replay-parser/"
+src_path = "warthunder-replay-parser/"
 packages = ["multiprocessing"]
 includes = []
 excludes = ["unittest", "pydoc", "construct.examples", "bz2", "lib2to3", "test", "tkinter"]
