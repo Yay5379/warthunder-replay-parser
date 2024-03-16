@@ -43,7 +43,7 @@ setup(
     name="warthunder-replay-parser",
     author='Yay5379',
     description="numerous War Thunder replay related things",
-    url="https://github.com/klensy/wt-tools",
+    url="https://github.com/Yay5379/warthunder-replay-parser",
     options={"build_exe": {"includes": includes, "excludes": excludes, "include_files": includefiles,
                            "packages": packages, "zip_include_packages": zip_include_packages,
                            "path": sys.path + [src_path]}},
