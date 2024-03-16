@@ -1,6 +1,6 @@
 import os.path
 import sys
-from cx_freeze import setup, Executable
+from cx_Freeze import setup, Executable
 
 src_path = "src/warthunder-replay-parser/"
 packages = ["multiprocessing"]
